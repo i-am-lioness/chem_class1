@@ -982,7 +982,7 @@ var folderMap = void 0;
   folderMap = fm;
   _reactDom2.default.render(_react2.default.createElement(_folderContent2.default, {
     folderMap: folderMap
-  }), document.getElementById('root'));
+  }), document.getElementById('fileDisplay'));
 });
 
 /***/ }),
