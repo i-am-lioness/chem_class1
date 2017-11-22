@@ -18323,15 +18323,26 @@ var FolderContents = function (_React$Component) {
     _this.eachFile = _this.eachFile.bind(_this);
     _this.eachLevel = _this.eachLevel.bind(_this);
     _this.navToFolder = _this.navToFolder.bind(_this);
+    _this.init = _this.init.bind(_this);
 
     _this.currentLine = null;
     return _this;
   }
 
   _createClass(FolderContents, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.init();
+    }
+  }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate(prevProps, prevState) {
-      if (!Object.prototype.hasOwnProperty.call(prevProps.folderMap, ROOT_FOLDER) && Object.prototype.hasOwnProperty.call(this.props.folderMap, ROOT_FOLDER)) {
+      if (!Object.prototype.hasOwnProperty.call(prevProps.folderMap, ROOT_FOLDER)) this.init();
+    }
+  }, {
+    key: 'init',
+    value: function init() {
+      if (Object.prototype.hasOwnProperty.call(this.props.folderMap, ROOT_FOLDER)) {
         this.navToFolder({ id: ROOT_FOLDER, name: 'Resources' }, -1);
       }
     }
