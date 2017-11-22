@@ -18329,9 +18329,11 @@ var FolderContents = function (_React$Component) {
   }
 
   _createClass(FolderContents, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      this.navToFolder({ id: ROOT_FOLDER, name: 'Resources' }, -1);
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState) {
+      if (!Object.prototype.hasOwnProperty.call(prevProps.folderMap, ROOT_FOLDER) && Object.prototype.hasOwnProperty.call(this.props.folderMap, ROOT_FOLDER)) {
+        this.navToFolder({ id: ROOT_FOLDER, name: 'Resources' }, -1);
+      }
     }
   }, {
     key: 'navigate',
@@ -18391,22 +18393,17 @@ var FolderContents = function (_React$Component) {
       );
 
       if (file.mimeType === 'application/vnd.google-apps.folder') {
-        contentLink = _react2.default.createElement(
-          'button',
-          {
-            className: 'folder-content-item',
-            onClick: function onClick(e) {
-              _this2.navigate(file, e, -1);
-            }
-          },
-          file.name
-        );
+        contentLink = file.name;
       }
 
       return _react2.default.createElement(
-        'p',
+        'button',
         {
-          className: 'folder-content-row',
+          type: 'button',
+          className: 'folder-content-item list-group-item list-group-item-action',
+          onClick: function onClick(e) {
+            _this2.navigate(file, e, -1);
+          },
           key: file.id,
           onMouseEnter: function onMouseEnter(e) {
             _this2.hoverStart(idx, e);
@@ -18421,18 +18418,18 @@ var FolderContents = function (_React$Component) {
       var _this3 = this;
 
       return _react2.default.createElement(
-        'span',
-        { key: file.id },
+        'li',
+        { key: file.id, className: 'breadcrumb-item' },
         _react2.default.createElement(
-          'button',
+          'a',
           {
+            href: '#',
             onClick: function onClick(e) {
               _this3.navigate(file, e, idx);
             }
           },
           file.name
-        ),
-        '/'
+        )
       );
     }
   }, {
@@ -18443,9 +18440,24 @@ var FolderContents = function (_React$Component) {
 
       return _react2.default.createElement(
         'div',
-        { id: 'lyricsDisplay', onMouseLeave: this.hoverEnd },
-        path,
-        rowDisplay
+        null,
+        _react2.default.createElement(
+          'nav',
+          { 'aria-label': 'breadcrumb', role: 'navigation' },
+          _react2.default.createElement(
+            'ol',
+            { className: 'breadcrumb' },
+            path
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          {
+            onMouseLeave: this.hoverEnd,
+            className: 'list-group'
+          },
+          rowDisplay
+        )
       );
     }
   }]);
