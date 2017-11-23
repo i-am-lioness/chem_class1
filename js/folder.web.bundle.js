@@ -18311,19 +18311,18 @@ var FolderContents = function (_React$Component) {
 
     _this.state = {
       path: [],
-      name: '',
       files: [],
-
-      hoveredIdx: -1
+      links: [],
+      currentFolderId: ''
     };
 
     _this.navigate = _this.navigate.bind(_this);
-    _this.hoverStart = _this.hoverStart.bind(_this);
-    _this.hoverEnd = _this.hoverEnd.bind(_this);
     _this.eachFile = _this.eachFile.bind(_this);
     _this.eachLevel = _this.eachLevel.bind(_this);
     _this.navToFolder = _this.navToFolder.bind(_this);
     _this.init = _this.init.bind(_this);
+    _this.handleAddLink = _this.handleAddLink.bind(_this);
+    _this.eachLink = _this.eachLink.bind(_this);
 
     _this.currentLine = null;
     return _this;
@@ -18349,7 +18348,7 @@ var FolderContents = function (_React$Component) {
   }, {
     key: 'navigate',
     value: function navigate(data, e, level) {
-      e && e.preventDefault();
+      e.preventDefault();
       this.navToFolder(data, level);
     }
   }, {
@@ -18357,12 +18356,18 @@ var FolderContents = function (_React$Component) {
     value: function navToFolder(data, level) {
       var folderID = data.id;
       var files = void 0;
+      var links = [];
 
       if (Object.prototype.hasOwnProperty.call(this.props.folderMap, folderID)) {
         files = this.props.folderMap[folderID];
       } else {
         throw new Error('Folder \'' + folderID + '\' not found.');
       }
+
+      if (Object.prototype.hasOwnProperty.call(this.props.linkMap, folderID)) {
+        links = this.props.linkMap[folderID];
+      } // TO DO: linkMap should be loaded
+
 
       var path = void 0;
       if (level > -1) {
@@ -18372,20 +18377,18 @@ var FolderContents = function (_React$Component) {
       }
 
       this.setState({
-        hoveredIdx: -1,
         path: path,
-        files: files
+        files: files,
+        links: links,
+        currentFolderId: folderID
       });
     }
   }, {
-    key: 'hoverStart',
-    value: function hoverStart(idx, e) {
-      this.setState({ hoveredIdx: idx });
-    }
-  }, {
-    key: 'hoverEnd',
-    value: function hoverEnd() {
-      this.setState({ hoveredIdx: -1 });
+    key: 'handleAddLink',
+    value: function handleAddLink(e) {
+      e.preventDefault();
+
+      this.props.onAddLink(this.state.currentFolderId);
     }
   }, {
     key: 'eachFile',
@@ -18415,12 +18418,22 @@ var FolderContents = function (_React$Component) {
           onClick: function onClick(e) {
             _this2.navigate(file, e, -1);
           },
-          key: file.id,
-          onMouseEnter: function onMouseEnter(e) {
-            _this2.hoverStart(idx, e);
-          }
+          key: file.id
         },
         contentLink
+      );
+    }
+  }, {
+    key: 'eachLink',
+    value: function eachLink(link, idx) {
+      return _react2.default.createElement(
+        'a',
+        {
+          href: link.url,
+          className: 'folder-content-item list-group-item list-group-item-action list-group-item-info',
+          key: idx
+        },
+        link.name
       );
     }
   }, {
@@ -18446,28 +18459,41 @@ var FolderContents = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var rowDisplay = this.state.files.map(this.eachFile);
+      var fileDisplay = this.state.files.map(this.eachFile);
+      var linkDisplay = this.state.links.map(this.eachLink);
       var path = this.state.path.map(this.eachLevel);
+
+      var addLinkBtn = this.props.admin && _react2.default.createElement(
+        'button',
+        {
+          className: 'btn btn-primary',
+          onClick: this.handleAddLink,
+          href: '#portfolioModalB',
+          'data-toggle': 'modal'
+        },
+        'Add Link'
+      );
 
       return _react2.default.createElement(
         'div',
         null,
         _react2.default.createElement(
           'nav',
-          { 'aria-label': 'breadcrumb', role: 'navigation' },
+          { 'aria-label': 'breadcrumb' },
           _react2.default.createElement(
             'ol',
             { className: 'breadcrumb' },
             path
-          )
+          ),
+          addLinkBtn
         ),
         _react2.default.createElement(
           'div',
           {
-            onMouseLeave: this.hoverEnd,
             className: 'list-group'
           },
-          rowDisplay
+          fileDisplay,
+          linkDisplay
         )
       );
     }
@@ -18476,8 +18502,16 @@ var FolderContents = function (_React$Component) {
   return FolderContents;
 }(_react2.default.Component);
 
+FolderContents.defaultProps = {
+  admin: false,
+  onAddLink: null
+};
+
 FolderContents.propTypes = {
-  folderMap: _propTypes2.default.object.isRequired
+  folderMap: _propTypes2.default.objectOf(_propTypes2.default.array).isRequired,
+  linkMap: _propTypes2.default.objectOf(_propTypes2.default.array).isRequired,
+  admin: _propTypes2.default.bool,
+  onAddLink: _propTypes2.default.func
 };
 
 exports.default = FolderContents;
@@ -19459,6 +19493,8 @@ module.exports = invariant;
 "use strict";
 /* WEBPACK VAR INJECTION */(function($) {
 
+/* global $, window */
+
 var API_KEY = 'AIzaSyAZoi72Rr-ft3ffrgJ9gDZ-O5_fyVNDe_k';
 var ROOT_FOLDER_ID = '1jhCLoVcxO0wD7MKZ4jtEtF6qCxixGo5c';
 
@@ -19472,10 +19508,19 @@ function getFileTreeFromGAPI(id, cb) {
 
   $.get('https://www.googleapis.com/drive/v3/files', query).then(function (response) {
     if (response) {
+      var files = response.files;
+
+      folderMap[id] = files;
+
+      var returns = -1;
+
       var onTraversalComplete = function onTraversalComplete() {
         returns += 1;
 
-        if (returns >= files.length) return cb();
+        if (returns >= files.length) {
+          cb();
+          return;
+        }
 
         var f = files[returns];
         if (f.mimeType === 'application/vnd.google-apps.folder') {
@@ -19484,13 +19529,6 @@ function getFileTreeFromGAPI(id, cb) {
           onTraversalComplete();
         }
       };
-
-      var files = response.files;
-      folderMap[id] = files;
-
-      var returns = -1;
-
-      ;
 
       onTraversalComplete();
     } else {
@@ -19523,8 +19561,17 @@ function preLoadFolderContent() {
   });
 }
 
+function loadLinkMap() {
+  var linkMap = {};
+  Object.keys(folderMap).forEach(function (prop) {
+    linkMap[prop] = [];
+  });
+  return Promise.resolve(linkMap);
+}
+
 var ki = {
-  preLoadFolderContent: preLoadFolderContent
+  preLoadFolderContent: preLoadFolderContent,
+  loadLinkMap: loadLinkMap
 };
 
 module.exports = ki;
