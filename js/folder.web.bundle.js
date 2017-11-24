@@ -18311,8 +18311,6 @@ var FolderContents = function (_React$Component) {
 
     _this.state = {
       path: [],
-      files: [],
-      links: [],
       currentFolderId: ''
     };
 
@@ -18355,19 +18353,6 @@ var FolderContents = function (_React$Component) {
     key: 'navToFolder',
     value: function navToFolder(data, level) {
       var folderID = data.id;
-      var files = void 0;
-      var links = [];
-
-      if (Object.prototype.hasOwnProperty.call(this.props.folderMap, folderID)) {
-        files = this.props.folderMap[folderID];
-      } else {
-        throw new Error('Folder \'' + folderID + '\' not found.');
-      }
-
-      if (Object.prototype.hasOwnProperty.call(this.props.linkMap, folderID)) {
-        links = this.props.linkMap[folderID];
-      } // TO DO: linkMap should be loaded
-
 
       var path = void 0;
       if (level > -1) {
@@ -18378,8 +18363,6 @@ var FolderContents = function (_React$Component) {
 
       this.setState({
         path: path,
-        files: files,
-        links: links,
         currentFolderId: folderID
       });
     }
@@ -18459,8 +18442,20 @@ var FolderContents = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var fileDisplay = this.state.files.map(this.eachFile);
-      var linkDisplay = this.state.links.map(this.eachLink);
+      var files = [];
+      var links = [];
+      var folderID = this.state.currentFolderId;
+
+      if (Object.prototype.hasOwnProperty.call(this.props.folderMap, folderID)) {
+        files = this.props.folderMap[folderID];
+      }
+
+      if (Object.prototype.hasOwnProperty.call(this.props.linkMap, folderID)) {
+        links = this.props.linkMap[folderID];
+      }
+
+      var fileDisplay = files.map(this.eachFile);
+      var linkDisplay = links.map(this.eachLink);
       var path = this.state.path.map(this.eachLevel);
 
       var addLinkBtn = this.props.admin && _react2.default.createElement(
@@ -19498,6 +19493,11 @@ module.exports = invariant;
 var API_KEY = 'AIzaSyAZoi72Rr-ft3ffrgJ9gDZ-O5_fyVNDe_k';
 var ROOT_FOLDER_ID = '1jhCLoVcxO0wD7MKZ4jtEtF6qCxixGo5c';
 
+var constants = {
+  FOLDER_MAP_FILE_NAME: 'folderMap2.json',
+  LINK_MAP_FILE_NAME: 'linkMap.json'
+};
+
 var folderMap = void 0;
 
 function getFileTreeFromGAPI(id, cb) {
@@ -19550,7 +19550,7 @@ function chooseSource() {
   if (window && window.process && window.process.type) {
     return loadDirectoryListing();
   } else {
-    return $.getJSON('folderMap2.json'); // TODO: update version with each build
+    return $.getJSON(constants.FOLDER_MAP_FILE_NAME); // TODO: update version with each build
   }
 }
 
@@ -19571,7 +19571,8 @@ function loadLinkMap() {
 
 var ki = {
   preLoadFolderContent: preLoadFolderContent,
-  loadLinkMap: loadLinkMap
+  loadLinkMap: loadLinkMap,
+  constants: constants
 };
 
 module.exports = ki;
