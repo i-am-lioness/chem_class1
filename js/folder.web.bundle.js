@@ -18327,6 +18327,7 @@ var FolderContents = function (_React$Component) {
   _createClass(FolderContents, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
+      this.sessionStart = new Date();
       this.init();
     }
   }, {
@@ -18407,11 +18408,13 @@ var FolderContents = function (_React$Component) {
   }, {
     key: 'eachLink',
     value: function eachLink(link, idx) {
+      var isNew = link.timestamp && link.timestamp > this.sessionStart;
+      var newClass = isNew ? 'list-group-item-info' : 'list-group-item-warning';
       return _react2.default.createElement(
         'a',
         {
           href: link.url,
-          className: 'folder-content-item list-group-item list-group-item-action list-group-item-info',
+          className: 'folder-content-item list-group-item list-group-item-action ' + newClass,
           key: idx
         },
         link.name
@@ -19500,7 +19503,7 @@ var constants = {
 var DESKTOP_MODE = window && window.process && window.process.type;
 
 var folderMap = void 0;
-$.ajaxSetup({ cache: false });
+$.ajaxSetup({ cache: false }); // to do: better handle json versioning
 
 function getFileTreeFromGAPI(id, cb) {
   var query = {
