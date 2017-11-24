@@ -19500,6 +19500,7 @@ var constants = {
 var DESKTOP_MODE = window && window.process && window.process.type;
 
 var folderMap = void 0;
+$.ajaxSetup({ cache: false });
 
 function getFileTreeFromGAPI(id, cb) {
   var query = {
