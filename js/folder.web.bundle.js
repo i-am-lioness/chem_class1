@@ -976,12 +976,10 @@ var _klassroomUtil = __webpack_require__(33);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* eslint-env browser */
-var folderMap = void 0;
-
-(0, _klassroomUtil.preLoadFolderContent)().then(function (fm) {
-  folderMap = fm;
+(0, _klassroomUtil.preLoadFolderContent)().then(function (maps) {
   _reactDom2.default.render(_react2.default.createElement(_folderContent2.default, {
-    folderMap: folderMap
+    folderMap: maps.folderMap,
+    linkMap: maps.linkMap
   }), document.getElementById('fileDisplay'));
 });
 
@@ -19495,8 +19493,11 @@ var ROOT_FOLDER_ID = '1jhCLoVcxO0wD7MKZ4jtEtF6qCxixGo5c';
 
 var constants = {
   FOLDER_MAP_FILE_NAME: 'folderMap2.json',
-  LINK_MAP_FILE_NAME: 'linkMap.json'
+  LINK_MAP_FILE_NAME: 'linkMap.json',
+  REMOTE_URL: 'https://nnennaude.github.io/chem_class1'
 };
+
+var DESKTOP_MODE = window && window.process && window.process.type;
 
 var folderMap = void 0;
 
@@ -19547,18 +19548,11 @@ function loadDirectoryListing() {
 }
 
 function chooseSource() {
-  if (window && window.process && window.process.type) {
+  if (DESKTOP_MODE) {
     return loadDirectoryListing();
   } else {
     return $.getJSON(constants.FOLDER_MAP_FILE_NAME); // TODO: update version with each build
   }
-}
-
-function preLoadFolderContent() {
-  return chooseSource().then(function (data) {
-    folderMap = data;
-    return folderMap;
-  });
 }
 
 function loadLinkMap() {
@@ -19566,12 +19560,25 @@ function loadLinkMap() {
   Object.keys(folderMap).forEach(function (prop) {
     linkMap[prop] = [];
   });
-  return Promise.resolve(linkMap);
+  var url = constants.LINK_MAP_FILE_NAME;
+  url = DESKTOP_MODE ? constants.REMOTE_URL + '/' + url : url;
+  return $.getJSON(url).then(function (data) {
+    Object.assign(linkMap, data);
+    return linkMap;
+  });
+}
+
+function preLoadFolderContent() {
+  return chooseSource().then(function (data) {
+    folderMap = data;
+    return loadLinkMap();
+  }).then(function (linkMap) {
+    return { linkMap: linkMap, folderMap: folderMap };
+  });
 }
 
 var ki = {
   preLoadFolderContent: preLoadFolderContent,
-  loadLinkMap: loadLinkMap,
   constants: constants
 };
 
