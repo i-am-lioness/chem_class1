@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -460,9 +460,9 @@ module.exports = invariant;
 /* WEBPACK VAR INJECTION */(function(process) {
 
 if (process.env.NODE_ENV === 'production') {
-  module.exports = __webpack_require__(16);
-} else {
   module.exports = __webpack_require__(17);
+} else {
+  module.exports = __webpack_require__(18);
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
@@ -895,7 +895,7 @@ module.exports = shallowEqual;
  * 
  */
 
-var isTextNode = __webpack_require__(20);
+var isTextNode = __webpack_require__(21);
 
 /*eslint-disable no-bitwise */
 
@@ -957,21 +957,143 @@ module.exports = focusNode;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/* WEBPACK VAR INJECTION */(function($) {
+
+/* global $, window */
+
+var API_KEY = 'AIzaSyAZoi72Rr-ft3ffrgJ9gDZ-O5_fyVNDe_k';
+var ROOT_FOLDER_ID = '1jhCLoVcxO0wD7MKZ4jtEtF6qCxixGo5c';
+
+var constants = {
+  FOLDER_MAP_FILE_NAME: 'folderMap2.json',
+  LINK_MAP_FILE_NAME: 'linkMap.json',
+  REMOTE_URL: 'https://nnennaude.github.io/chem_class1'
+};
+
+var linkTypes = {
+  OTHER: 0,
+  WEBSITE: 1,
+  VIDEO: 2,
+  DOCUMENT: 3
+};
+
+var DESKTOP_MODE = window && window.process && window.process.type;
+
+var folderMap = void 0;
+
+function loadFreshJSON(url) {
+  return $.ajax({
+    cache: false,
+    url: url,
+    dataType: 'json'
+  });
+}
+
+function getFileTreeFromGAPI(id, cb) {
+  var query = {
+    q: '\'' + id + '\' in parents',
+    key: API_KEY
+  };
+
+  $.get('https://www.googleapis.com/drive/v3/files', query).then(function (response) {
+    if (response) {
+      var files = response.files;
+
+      folderMap[id] = files;
+
+      var returns = -1;
+
+      var onTraversalComplete = function onTraversalComplete() {
+        returns += 1;
+
+        if (returns >= files.length) {
+          cb();
+          return;
+        }
+
+        var f = files[returns];
+        if (f.mimeType === 'application/vnd.google-apps.folder') {
+          getFileTreeFromGAPI(f.id, onTraversalComplete);
+        } else {
+          onTraversalComplete();
+        }
+      };
+
+      onTraversalComplete();
+    } else {
+      throw new Error('folder data not found.');
+    }
+  });
+}
+
+function loadDirectoryListing() {
+  folderMap = {};
+  return new Promise(function (resolve, reject) {
+    getFileTreeFromGAPI(ROOT_FOLDER_ID, function () {
+      resolve(folderMap);
+    });
+  });
+}
+
+function chooseSource() {
+  if (DESKTOP_MODE) {
+    return loadDirectoryListing();
+  } else {
+    return loadFreshJSON(constants.FOLDER_MAP_FILE_NAME);
+  }
+}
+
+function loadLinkMap() {
+  var linkMap = {};
+  Object.keys(folderMap).forEach(function (prop) {
+    linkMap[prop] = [];
+  });
+  var url = constants.LINK_MAP_FILE_NAME;
+  url = DESKTOP_MODE ? constants.REMOTE_URL + '/' + url : url;
+  return loadFreshJSON(url).then(function (data) {
+    Object.assign(linkMap, data);
+    return linkMap;
+  });
+}
+
+function preLoadFolderContent() {
+  return chooseSource().then(function (data) {
+    folderMap = data;
+    return loadLinkMap();
+  }).then(function (linkMap) {
+    return { linkMap: linkMap, folderMap: folderMap };
+  });
+}
+
+var ki = {
+  preLoadFolderContent: preLoadFolderContent,
+  constants: constants,
+  linkTypes: linkTypes
+};
+
+module.exports = ki;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34)))
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 
 
 var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(18);
+var _reactDom = __webpack_require__(19);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _folderContent = __webpack_require__(27);
+var _folderContent = __webpack_require__(28);
 
 var _folderContent2 = _interopRequireDefault(_folderContent);
 
-var _klassroomUtil = __webpack_require__(33);
+var _klassroomUtil = __webpack_require__(15);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -984,7 +1106,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 });
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1013,7 +1135,7 @@ version:"16.1.1",__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED:{ReactCurren
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2364,7 +2486,7 @@ module.exports = react;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2402,15 +2524,15 @@ if (process.env.NODE_ENV === 'production') {
   // DCE check should happen before ReactDOM bundle executes so that
   // DevTools can report bad minification during injection.
   checkDCE();
-  module.exports = __webpack_require__(19);
+  module.exports = __webpack_require__(20);
 } else {
-  module.exports = __webpack_require__(22);
+  module.exports = __webpack_require__(23);
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2644,7 +2766,7 @@ Z.injectIntoDevTools({findFiberByHostInstance:qb,bundleType:0,version:"16.1.1",r
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2659,7 +2781,7 @@ Z.injectIntoDevTools({findFiberByHostInstance:qb,bundleType:0,version:"16.1.1",r
  * @typechecks
  */
 
-var isNode = __webpack_require__(21);
+var isNode = __webpack_require__(22);
 
 /**
  * @param {*} object The object to check.
@@ -2672,7 +2794,7 @@ function isTextNode(object) {
 module.exports = isTextNode;
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2700,7 +2822,7 @@ function isNode(object) {
 module.exports = isNode;
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2732,8 +2854,8 @@ var containsNode = __webpack_require__(13);
 var focusNode = __webpack_require__(14);
 var emptyObject = __webpack_require__(5);
 var checkPropTypes = __webpack_require__(7);
-var hyphenateStyleName = __webpack_require__(23);
-var camelizeStyleName = __webpack_require__(25);
+var hyphenateStyleName = __webpack_require__(24);
+var camelizeStyleName = __webpack_require__(26);
 
 /**
  * WARNING: DO NOT manually require this module.
@@ -18108,7 +18230,7 @@ module.exports = reactDom;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18123,7 +18245,7 @@ module.exports = reactDom;
 
 
 
-var hyphenate = __webpack_require__(24);
+var hyphenate = __webpack_require__(25);
 
 var msPattern = /^ms-/;
 
@@ -18150,7 +18272,7 @@ function hyphenateStyleName(string) {
 module.exports = hyphenateStyleName;
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18186,7 +18308,7 @@ function hyphenate(string) {
 module.exports = hyphenate;
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18201,7 +18323,7 @@ module.exports = hyphenate;
 
 
 
-var camelize = __webpack_require__(26);
+var camelize = __webpack_require__(27);
 
 var msPattern = /^-ms-/;
 
@@ -18229,7 +18351,7 @@ function camelizeStyleName(string) {
 module.exports = camelizeStyleName;
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18264,7 +18386,7 @@ function camelize(string) {
 module.exports = camelize;
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18280,13 +18402,15 @@ var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = __webpack_require__(28);
+var _propTypes = __webpack_require__(29);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _immutabilityHelper = __webpack_require__(31);
+var _immutabilityHelper = __webpack_require__(32);
 
 var _immutabilityHelper2 = _interopRequireDefault(_immutabilityHelper);
+
+var _klassroomUtil = __webpack_require__(15);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18317,7 +18441,6 @@ var FolderContents = function (_React$Component) {
     _this.eachLevel = _this.eachLevel.bind(_this);
     _this.navToFolder = _this.navToFolder.bind(_this);
     _this.init = _this.init.bind(_this);
-    _this.handleAddLink = _this.handleAddLink.bind(_this);
     _this.eachLink = _this.eachLink.bind(_this);
 
     _this.currentLine = null;
@@ -18364,13 +18487,7 @@ var FolderContents = function (_React$Component) {
         path: path,
         currentFolderId: folderID
       });
-    }
-  }, {
-    key: 'handleAddLink',
-    value: function handleAddLink(e) {
-      e.preventDefault();
-
-      this.props.onAddLink(this.state.currentFolderId);
+      this.props.updateCurrentFolder(folderID);
     }
   }, {
     key: 'eachFile',
@@ -18408,22 +18525,56 @@ var FolderContents = function (_React$Component) {
   }, {
     key: 'eachLink',
     value: function eachLink(link, idx) {
+      var _this3 = this;
+
       var isNew = link.timestamp && link.timestamp > this.sessionStart;
       var newClass = isNew ? 'list-group-item-info' : 'list-group-item-warning';
-      return _react2.default.createElement(
-        'a',
+
+      var deleteLinkBtn = _react2.default.createElement(
+        'button',
         {
-          href: link.url,
+          type: 'button',
+          className: 'btn btn-outline-primary btn-sm',
+          onClick: function onClick(e) {
+            e.preventDefault();_this3.props.deleteLink(idx);
+          }
+        },
+        _react2.default.createElement('i', { className: 'fa fa-trash-o', 'aria-hidden': 'true' })
+      );
+
+      var icon = void 0;
+      console.log('link.type', link.type);
+      switch (link.type) {
+        case _klassroomUtil.linkTypes.DOCUMENT:
+          icon = 'file-text-o';
+          break;
+        case _klassroomUtil.linkTypes.VIDEO:
+          icon = 'film';
+          break;
+        case _klassroomUtil.linkTypes.WEBSITE:
+        default:
+          icon = 'link';
+      }
+      return _react2.default.createElement(
+        'li',
+        {
           className: 'folder-content-item list-group-item list-group-item-action ' + newClass,
           key: idx
         },
-        link.name
+        _react2.default.createElement(
+          'a',
+          { href: link.url },
+          _react2.default.createElement('i', { className: 'fa fa-' + icon + ' fa-fw', 'aria-hidden': 'true' }),
+          '\xA0',
+          link.name
+        ),
+        this.props.admin && deleteLinkBtn
       );
     }
   }, {
     key: 'eachLevel',
     value: function eachLevel(file, idx) {
-      var _this3 = this;
+      var _this4 = this;
 
       return _react2.default.createElement(
         'li',
@@ -18431,9 +18582,9 @@ var FolderContents = function (_React$Component) {
         _react2.default.createElement(
           'a',
           {
-            href: '#',
+            href: '#' + file.name,
             onClick: function onClick(e) {
-              _this3.navigate(file, e, idx);
+              _this4.navigate(file, e, idx);
             }
           },
           file.name
@@ -18500,20 +18651,22 @@ var FolderContents = function (_React$Component) {
 
 FolderContents.defaultProps = {
   admin: false,
-  onAddLink: null
+  updateCurrentFolder: null,
+  deleteLink: null
 };
 
 FolderContents.propTypes = {
   folderMap: _propTypes2.default.objectOf(_propTypes2.default.array).isRequired,
   linkMap: _propTypes2.default.objectOf(_propTypes2.default.array).isRequired,
+  deleteLink: _propTypes2.default.func,
   admin: _propTypes2.default.bool,
-  onAddLink: _propTypes2.default.func
+  updateCurrentFolder: _propTypes2.default.func
 };
 
 exports.default = FolderContents;
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {/**
@@ -18538,17 +18691,17 @@ if (process.env.NODE_ENV !== 'production') {
   // By explicitly using `prop-types` you are opting into new development behavior.
   // http://fb.me/prop-types-in-prod
   var throwOnDirectAccess = true;
-  module.exports = __webpack_require__(29)(isValidElement, throwOnDirectAccess);
+  module.exports = __webpack_require__(30)(isValidElement, throwOnDirectAccess);
 } else {
   // By explicitly using `prop-types` you are opting into new production behavior.
   // http://fb.me/prop-types-in-prod
-  module.exports = __webpack_require__(30)();
+  module.exports = __webpack_require__(31)();
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19098,7 +19251,7 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19163,10 +19316,10 @@ module.exports = function() {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var invariant = __webpack_require__(32);
+var invariant = __webpack_require__(33);
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var splice = Array.prototype.splice;
@@ -19424,7 +19577,7 @@ function invariantMapOrSet(target, command) {
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19481,120 +19634,6 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 module.exports = invariant;
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function($) {
-
-/* global $, window */
-
-var API_KEY = 'AIzaSyAZoi72Rr-ft3ffrgJ9gDZ-O5_fyVNDe_k';
-var ROOT_FOLDER_ID = '1jhCLoVcxO0wD7MKZ4jtEtF6qCxixGo5c';
-
-var constants = {
-  FOLDER_MAP_FILE_NAME: 'folderMap2.json',
-  LINK_MAP_FILE_NAME: 'linkMap.json',
-  REMOTE_URL: 'https://nnennaude.github.io/chem_class1'
-};
-
-var DESKTOP_MODE = window && window.process && window.process.type;
-
-var folderMap = void 0;
-
-function loadFreshJSON(url) {
-  return $.ajax({
-    cache: false,
-    url: url,
-    dataType: 'json'
-  });
-}
-
-function getFileTreeFromGAPI(id, cb) {
-  var query = {
-    q: '\'' + id + '\' in parents',
-    key: API_KEY
-  };
-
-  $.get('https://www.googleapis.com/drive/v3/files', query).then(function (response) {
-    if (response) {
-      var files = response.files;
-
-      folderMap[id] = files;
-
-      var returns = -1;
-
-      var onTraversalComplete = function onTraversalComplete() {
-        returns += 1;
-
-        if (returns >= files.length) {
-          cb();
-          return;
-        }
-
-        var f = files[returns];
-        if (f.mimeType === 'application/vnd.google-apps.folder') {
-          getFileTreeFromGAPI(f.id, onTraversalComplete);
-        } else {
-          onTraversalComplete();
-        }
-      };
-
-      onTraversalComplete();
-    } else {
-      throw new Error('folder data not found.');
-    }
-  });
-}
-
-function loadDirectoryListing() {
-  folderMap = {};
-  return new Promise(function (resolve, reject) {
-    getFileTreeFromGAPI(ROOT_FOLDER_ID, function () {
-      resolve(folderMap);
-    });
-  });
-}
-
-function chooseSource() {
-  if (DESKTOP_MODE) {
-    return loadDirectoryListing();
-  } else {
-    return loadFreshJSON(constants.FOLDER_MAP_FILE_NAME);
-  }
-}
-
-function loadLinkMap() {
-  var linkMap = {};
-  Object.keys(folderMap).forEach(function (prop) {
-    linkMap[prop] = [];
-  });
-  var url = constants.LINK_MAP_FILE_NAME;
-  url = DESKTOP_MODE ? constants.REMOTE_URL + '/' + url : url;
-  return loadFreshJSON(url).then(function (data) {
-    Object.assign(linkMap, data);
-    return linkMap;
-  });
-}
-
-function preLoadFolderContent() {
-  return chooseSource().then(function (data) {
-    folderMap = data;
-    return loadLinkMap();
-  }).then(function (linkMap) {
-    return { linkMap: linkMap, folderMap: folderMap };
-  });
-}
-
-var ki = {
-  preLoadFolderContent: preLoadFolderContent,
-  constants: constants
-};
-
-module.exports = ki;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34)))
 
 /***/ }),
 /* 34 */
