@@ -19503,7 +19503,14 @@ var constants = {
 var DESKTOP_MODE = window && window.process && window.process.type;
 
 var folderMap = void 0;
-$.ajaxSetup({ cache: false }); // to do: better handle json versioning
+
+function loadFreshJSON(url) {
+  return $.ajax({
+    cache: false,
+    url: url,
+    dataType: 'json'
+  });
+}
 
 function getFileTreeFromGAPI(id, cb) {
   var query = {
@@ -19555,7 +19562,7 @@ function chooseSource() {
   if (DESKTOP_MODE) {
     return loadDirectoryListing();
   } else {
-    return $.getJSON(constants.FOLDER_MAP_FILE_NAME); // TODO: update version with each build
+    return loadFreshJSON(constants.FOLDER_MAP_FILE_NAME);
   }
 }
 
@@ -19566,7 +19573,7 @@ function loadLinkMap() {
   });
   var url = constants.LINK_MAP_FILE_NAME;
   url = DESKTOP_MODE ? constants.REMOTE_URL + '/' + url : url;
-  return $.getJSON(url).then(function (data) {
+  return loadFreshJSON(url).then(function (data) {
     Object.assign(linkMap, data);
     return linkMap;
   });
