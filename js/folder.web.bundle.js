@@ -18487,7 +18487,7 @@ var FolderContents = function (_React$Component) {
         path: path,
         currentFolderId: folderID
       });
-      this.props.updateCurrentFolder(folderID);
+      if (this.props.updateCurrentFolder) this.props.updateCurrentFolder(folderID);
     }
   }, {
     key: 'eachFile',
