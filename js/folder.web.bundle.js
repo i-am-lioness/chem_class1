@@ -18469,9 +18469,9 @@ function iconByType(listing) {
 
 function compareByTypeThenName(a, b) {
   if (a.mimeType === mimeTypes.FOLDER && b.mimeType !== mimeTypes.FOLDER) {
-    return 1;
-  } else if (a.mimeType !== mimeTypes.FOLDER && b.mimeType === mimeTypes.FOLDER) {
     return -1;
+  } else if (a.mimeType !== mimeTypes.FOLDER && b.mimeType === mimeTypes.FOLDER) {
+    return 1;
   }
   return a.name > b.name;
 }
@@ -18558,23 +18558,27 @@ var FolderContents = function (_React$Component) {
         file.name
       );
 
-      // console.log('file.mimeType', file.mimeType);
       if (file.mimeType === mimeTypes.FOLDER) {
         contentLink = _react2.default.createElement(
-          'strong',
-          null,
-          file.name
+          'a',
+          {
+            href: '#' + file.name,
+            onClick: function onClick(e) {
+              _this2.navigate(file, e, -1);
+            }
+          },
+          _react2.default.createElement(
+            'strong',
+            null,
+            file.name
+          )
         );
       }
 
       return _react2.default.createElement(
-        'button',
+        'li',
         {
-          type: 'button',
           className: 'folder-content-item list-group-item list-group-item-action',
-          onClick: function onClick(e) {
-            _this2.navigate(file, e, -1);
-          },
           key: file.id
         },
         iconByType(file),
