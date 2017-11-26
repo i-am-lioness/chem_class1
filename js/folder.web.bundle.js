@@ -974,7 +974,8 @@ var linkTypes = {
   OTHER: 0,
   WEBSITE: 1,
   VIDEO: 2,
-  DOCUMENT: 3
+  DOCUMENT: 3,
+  YOUTUBE_VIDEO: 4
 };
 
 var DESKTOP_MODE = window && window.process && window.process.type;
@@ -18452,6 +18453,9 @@ function iconByType(listing) {
         break;
       case _klassroomUtil.linkTypes.VIDEO:
         icon = 'film';
+        break;
+      case _klassroomUtil.linkTypes.YOUTUBE_VIDEO:
+        icon = 'youtube-play';
         break;
       case _klassroomUtil.linkTypes.WEBSITE:
       default:
