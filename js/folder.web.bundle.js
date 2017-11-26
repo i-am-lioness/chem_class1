@@ -18423,6 +18423,59 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var ROOT_FOLDER = '1jhCLoVcxO0wD7MKZ4jtEtF6qCxixGo5c';
 
+var mimeTypes = {
+  FOLDER: 'application/vnd.google-apps.folder',
+  POWERPOINT: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  PDF: 'application/pdf'
+};
+
+function iconByType(listing) {
+  var icon = void 0;
+  if (Object.prototype.hasOwnProperty.call(listing, 'mimeType')) {
+    switch (listing.mimeType) {
+      case mimeTypes.FOLDER:
+        icon = 'folder';
+        break;
+      case mimeTypes.POWERPOINT:
+        icon = 'file-powerpoint-o';
+        break;
+      case mimeTypes.PDF:
+        icon = 'file-pdf-o';
+        break;
+      default:
+        icon = 'file';
+    }
+  } else {
+    switch (+listing.type) {
+      case _klassroomUtil.linkTypes.DOCUMENT:
+        icon = 'file-text-o';
+        break;
+      case _klassroomUtil.linkTypes.VIDEO:
+        icon = 'film';
+        break;
+      case _klassroomUtil.linkTypes.WEBSITE:
+      default:
+        icon = 'link';
+    }
+  }
+
+  return _react2.default.createElement(
+    'span',
+    null,
+    _react2.default.createElement('i', { className: 'fa fa-' + icon + ' fa-fw', 'aria-hidden': 'true' }),
+    ' \xA0'
+  );
+}
+
+function compareByTypeThenName(a, b) {
+  if (a.mimeType === mimeTypes.FOLDER && b.mimeType !== mimeTypes.FOLDER) {
+    return 1;
+  } else if (a.mimeType !== mimeTypes.FOLDER && b.mimeType === mimeTypes.FOLDER) {
+    return -1;
+  }
+  return a.name > b.name;
+}
+
 var FolderContents = function (_React$Component) {
   _inherits(FolderContents, _React$Component);
 
@@ -18505,8 +18558,13 @@ var FolderContents = function (_React$Component) {
         file.name
       );
 
-      if (file.mimeType === 'application/vnd.google-apps.folder') {
-        contentLink = file.name;
+      // console.log('file.mimeType', file.mimeType);
+      if (file.mimeType === mimeTypes.FOLDER) {
+        contentLink = _react2.default.createElement(
+          'strong',
+          null,
+          file.name
+        );
       }
 
       return _react2.default.createElement(
@@ -18519,6 +18577,7 @@ var FolderContents = function (_React$Component) {
           },
           key: file.id
         },
+        iconByType(file),
         contentLink
       );
     }
@@ -18559,19 +18618,6 @@ var FolderContents = function (_React$Component) {
         )
       );
 
-      var icon = void 0;
-      console.log('link.type', link.type);
-      switch (link.type) {
-        case _klassroomUtil.linkTypes.DOCUMENT:
-          icon = 'file-text-o';
-          break;
-        case _klassroomUtil.linkTypes.VIDEO:
-          icon = 'film';
-          break;
-        case _klassroomUtil.linkTypes.WEBSITE:
-        default:
-          icon = 'link';
-      }
       return _react2.default.createElement(
         'li',
         {
@@ -18581,8 +18627,7 @@ var FolderContents = function (_React$Component) {
         _react2.default.createElement(
           'a',
           { href: link.url },
-          _react2.default.createElement('i', { className: 'fa fa-' + icon + ' fa-fw', 'aria-hidden': 'true' }),
-          '\xA0',
+          iconByType(link),
           link.name
         ),
         this.props.admin && editLinkBtns
@@ -18616,7 +18661,8 @@ var FolderContents = function (_React$Component) {
       var folderID = this.state.currentFolderId;
 
       if (Object.prototype.hasOwnProperty.call(this.props.folderMap, folderID)) {
-        files = this.props.folderMap[folderID];
+        // files = this.props.folderMap[folderID];
+        files = [].concat(this.props.folderMap[folderID]).sort(compareByTypeThenName);
       }
 
       if (Object.prototype.hasOwnProperty.call(this.props.linkMap, folderID)) {
