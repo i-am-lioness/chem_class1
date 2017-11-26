@@ -18530,16 +18530,33 @@ var FolderContents = function (_React$Component) {
       var isNew = link.timestamp && link.timestamp > this.sessionStart;
       var newClass = isNew ? 'list-group-item-info' : 'list-group-item-warning';
 
-      var deleteLinkBtn = _react2.default.createElement(
-        'button',
-        {
-          type: 'button',
-          className: 'btn btn-outline-primary btn-sm',
-          onClick: function onClick(e) {
-            e.preventDefault();_this3.props.deleteLink(idx);
-          }
-        },
-        _react2.default.createElement('i', { className: 'fa fa-trash-o', 'aria-hidden': 'true' })
+      var editLinkBtns = _react2.default.createElement(
+        'span',
+        null,
+        _react2.default.createElement(
+          'button',
+          {
+            type: 'button',
+            className: 'btn btn-outline-primary btn-sm',
+            onClick: function onClick(e) {
+              e.preventDefault();_this3.props.deleteLink(idx);
+            }
+          },
+          _react2.default.createElement('i', { className: 'fa fa-trash-o', 'aria-hidden': 'true' })
+        ),
+        _react2.default.createElement(
+          'button',
+          {
+            type: 'button',
+            href: '#portfolioModalB',
+            'data-toggle': 'modal',
+            className: 'btn btn-outline-primary btn-sm',
+            onClick: function onClick(e) {
+              e.preventDefault();_this3.props.editLink(link, idx);
+            }
+          },
+          _react2.default.createElement('i', { className: 'fa fa-pencil', 'aria-hidden': 'true' })
+        )
       );
 
       var icon = void 0;
@@ -18568,7 +18585,7 @@ var FolderContents = function (_React$Component) {
           '\xA0',
           link.name
         ),
-        this.props.admin && deleteLinkBtn
+        this.props.admin && editLinkBtns
       );
     }
   }, {
@@ -18652,13 +18669,15 @@ var FolderContents = function (_React$Component) {
 FolderContents.defaultProps = {
   admin: false,
   updateCurrentFolder: null,
-  deleteLink: null
+  deleteLink: null,
+  editLink: null
 };
 
 FolderContents.propTypes = {
   folderMap: _propTypes2.default.objectOf(_propTypes2.default.array).isRequired,
   linkMap: _propTypes2.default.objectOf(_propTypes2.default.array).isRequired,
   deleteLink: _propTypes2.default.func,
+  editLink: _propTypes2.default.func,
   admin: _propTypes2.default.bool,
   updateCurrentFolder: _propTypes2.default.func
 };
