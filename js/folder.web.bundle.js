@@ -29046,46 +29046,54 @@ var FolderEditor = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var display = _react2.default.createElement('i', { className: 'fa fa-spinner fa-pulse fa-3x fa-fw fa-5x' });
+      var display = _react2.default.createElement(
+        'p',
+        { className: 'text-center' },
+        _react2.default.createElement('i', { className: 'fa fa-spinner fa-pulse fa-3x fa-fw fa-5x' })
+      );
 
       if (this.state.folderMap) {
-        display = _react2.default.createElement(_folderContent2.default, {
-          currentFolder: this.state.currentFolder,
-          folderMap: this.state.folderMap,
-          linkMap: this.state.linkMap,
-          navigateTo: this.setCurrentFolder,
-          deleteLink: this.deleteLink,
-          editLink: this.editLink,
-          admin: false
-        });
+        display = _react2.default.createElement(
+          'span',
+          null,
+          _react2.default.createElement(_folderContent2.default, {
+            currentFolder: this.state.currentFolder,
+            folderMap: this.state.folderMap,
+            linkMap: this.state.linkMap,
+            navigateTo: this.setCurrentFolder,
+            deleteLink: this.deleteLink,
+            editLink: this.editLink,
+            admin: false
+          }),
+          false && _react2.default.createElement(
+            'span',
+            null,
+            _react2.default.createElement(
+              'a',
+              {
+                className: 'btn btn-primary btn-lg btn-block',
+                href: '#portfolioModalA',
+                'data-toggle': 'modal'
+              },
+              'Publish'
+            ),
+            _react2.default.createElement(_publisher2.default, {
+              folderMap: this.state.folderMap,
+              linkMap: this.state.linkMap
+            }),
+            _react2.default.createElement(_linkEditor2.default, {
+              onAdd: this.addLink,
+              onSave: this.saveLink,
+              linkToModify: this.state.linkToModify
+            })
+          )
+        );
       }
 
       return _react2.default.createElement(
         'div',
         null,
-        display,
-        false && _react2.default.createElement(
-          'span',
-          null,
-          _react2.default.createElement(
-            'a',
-            {
-              className: 'btn btn-primary btn-lg btn-block',
-              href: '#portfolioModalA',
-              'data-toggle': 'modal'
-            },
-            'Publish'
-          ),
-          _react2.default.createElement(_publisher2.default, {
-            folderMap: this.state.folderMap,
-            linkMap: this.state.linkMap
-          }),
-          _react2.default.createElement(_linkEditor2.default, {
-            onAdd: this.addLink,
-            onSave: this.saveLink,
-            linkToModify: this.state.linkToModify
-          })
-        )
+        display
       );
     }
   }]);
@@ -29461,12 +29469,14 @@ var FolderContents = function (_React$Component) {
       var addLinkBtn = this.props.admin && _react2.default.createElement(
         'button',
         {
-          className: 'btn btn-primary',
+          type: 'button',
+          className: 'list-group-item list-group-item-action list-group-item-light',
           onClick: this.handleAddLink,
           href: '#portfolioModalB',
           'data-toggle': 'modal'
         },
-        'Add Link'
+        _react2.default.createElement('i', { className: 'fa fa-plus fa-fw', 'aria-hidden': 'true' }),
+        ' \xA0 Add Link'
       );
 
       return _react2.default.createElement(
@@ -29479,8 +29489,7 @@ var FolderContents = function (_React$Component) {
             'ol',
             { className: 'breadcrumb' },
             path
-          ),
-          addLinkBtn
+          )
         ),
         _react2.default.createElement(
           'div',
@@ -29488,7 +29497,8 @@ var FolderContents = function (_React$Component) {
             className: 'list-group'
           },
           fileDisplay,
-          linkDisplay
+          linkDisplay,
+          addLinkBtn
         ),
         _react2.default.createElement(_player2.default, { videoData: this.state.currentVideo })
       );
