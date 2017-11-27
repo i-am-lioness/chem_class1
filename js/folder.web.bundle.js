@@ -29260,6 +29260,15 @@ function compareByTypeThenName(a, b) {
   return a.name > b.name;
 }
 
+function smoothScroll(hash) {
+  var target = window.$(hash);
+  if (target.length) {
+    window.$('html, body').animate({
+      scrollTop: target.offset().top - 48
+    }, 1000, 'easeInOutExpo');
+  }
+}
+
 var FolderContents = function (_React$Component) {
   _inherits(FolderContents, _React$Component);
 
@@ -29304,6 +29313,7 @@ var FolderContents = function (_React$Component) {
         path: path
       });
       this.props.navigateTo(folderID);
+      smoothScroll('#resources');
     }
   }, {
     key: 'playVideo',
