@@ -18486,7 +18486,7 @@ function iconByType(listing) {
         icon = 'file';
     }
   } else {
-    switch (+listing.type) {
+    switch (listing.type) {
       case _klassroomUtil.linkTypes.DOCUMENT:
         icon = 'file-text-o';
         break;
@@ -18673,7 +18673,7 @@ var FolderContents = function (_React$Component) {
       );
 
       var anchor = void 0;
-      if (+link.type === _klassroomUtil.linkTypes.YOUTUBE_VIDEO) {
+      if (link.type === _klassroomUtil.linkTypes.YOUTUBE_VIDEO) {
         anchor = _react2.default.createElement(
           'a',
           {
