@@ -28987,9 +28987,9 @@ var FolderEditor = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (FolderEditor.__proto__ || Object.getPrototypeOf(FolderEditor)).call(this, props));
 
     _this.state = {
-      folderMap: {},
-      linkMap: {},
-      currentFolder: '',
+      folderMap: null,
+      linkMap: null,
+      currentFolder: null,
       editIndex: -1,
       linkToModify: null
     };
@@ -29046,17 +29046,24 @@ var FolderEditor = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement(_folderContent2.default, {
+      var display = _react2.default.createElement('i', { className: 'fa fa-spinner fa-pulse fa-3x fa-fw fa-5x' });
+
+      if (this.state.folderMap) {
+        display = _react2.default.createElement(_folderContent2.default, {
+          currentFolder: this.state.currentFolder,
           folderMap: this.state.folderMap,
           linkMap: this.state.linkMap,
-          updateCurrentFolder: this.setCurrentFolder,
+          navigateTo: this.setCurrentFolder,
           deleteLink: this.deleteLink,
           editLink: this.editLink,
           admin: false
-        }),
+        });
+      }
+
+      return _react2.default.createElement(
+        'div',
+        null,
+        display,
         false && _react2.default.createElement(
           'span',
           null,
@@ -29254,15 +29261,12 @@ var FolderContents = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (FolderContents.__proto__ || Object.getPrototypeOf(FolderContents)).call(this, props));
 
     _this.state = {
-      path: [],
-      currentFolderId: ''
+      path: [{ id: ROOT_FOLDER, name: 'Resources' }]
     };
 
     _this.navigate = _this.navigate.bind(_this);
     _this.eachFile = _this.eachFile.bind(_this);
     _this.eachLevel = _this.eachLevel.bind(_this);
-    _this.navToFolder = _this.navToFolder.bind(_this);
-    _this.init = _this.init.bind(_this);
     _this.eachLink = _this.eachLink.bind(_this);
     _this.playVideo = _this.playVideo.bind(_this);
 
@@ -29274,29 +29278,11 @@ var FolderContents = function (_React$Component) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       this.sessionStart = new Date();
-      this.init();
-    }
-  }, {
-    key: 'componentDidUpdate',
-    value: function componentDidUpdate(prevProps, prevState) {
-      if (!Object.prototype.hasOwnProperty.call(prevProps.folderMap, ROOT_FOLDER)) this.init();
-    }
-  }, {
-    key: 'init',
-    value: function init() {
-      if (Object.prototype.hasOwnProperty.call(this.props.folderMap, ROOT_FOLDER)) {
-        this.navToFolder({ id: ROOT_FOLDER, name: 'Resources' }, -1);
-      }
     }
   }, {
     key: 'navigate',
     value: function navigate(data, e, level) {
       e.preventDefault();
-      this.navToFolder(data, level);
-    }
-  }, {
-    key: 'navToFolder',
-    value: function navToFolder(data, level) {
       var folderID = data.id;
 
       var path = void 0;
@@ -29307,10 +29293,9 @@ var FolderContents = function (_React$Component) {
       }
 
       this.setState({
-        path: path,
-        currentFolderId: folderID
+        path: path
       });
-      if (this.props.updateCurrentFolder) this.props.updateCurrentFolder(folderID);
+      this.props.navigateTo(folderID);
     }
   }, {
     key: 'playVideo',
@@ -29459,14 +29444,13 @@ var FolderContents = function (_React$Component) {
     value: function render() {
       var files = [];
       var links = [];
-      var folderID = this.state.currentFolderId;
+      var folderID = this.props.currentFolder || ROOT_FOLDER;
 
-      if (Object.prototype.hasOwnProperty.call(this.props.folderMap, folderID)) {
-        // files = this.props.folderMap[folderID];
+      if (this.props.folderMap && Object.prototype.hasOwnProperty.call(this.props.folderMap, folderID)) {
         files = [].concat(this.props.folderMap[folderID]).sort(compareByTypeThenName);
       }
 
-      if (Object.prototype.hasOwnProperty.call(this.props.linkMap, folderID)) {
+      if (this.props.linkMap && Object.prototype.hasOwnProperty.call(this.props.linkMap, folderID)) {
         links = this.props.linkMap[folderID];
       }
 
@@ -29515,19 +29499,22 @@ var FolderContents = function (_React$Component) {
 }(_react2.default.Component);
 
 FolderContents.defaultProps = {
+  folderMap: {},
+  linkMap: {},
+  currentFolder: ROOT_FOLDER,
   admin: false,
-  updateCurrentFolder: null,
   deleteLink: null,
   editLink: null
 };
 
 FolderContents.propTypes = {
-  folderMap: _propTypes2.default.objectOf(_propTypes2.default.array).isRequired,
-  linkMap: _propTypes2.default.objectOf(_propTypes2.default.array).isRequired,
+  folderMap: _propTypes2.default.objectOf(_propTypes2.default.array),
+  linkMap: _propTypes2.default.objectOf(_propTypes2.default.array),
+  currentFolder: _propTypes2.default.string,
   deleteLink: _propTypes2.default.func,
   editLink: _propTypes2.default.func,
   admin: _propTypes2.default.bool,
-  updateCurrentFolder: _propTypes2.default.func
+  navigateTo: _propTypes2.default.func.isRequired
 };
 
 exports.default = FolderContents;
@@ -30522,9 +30509,14 @@ var Publisher = function (_React$Component) {
   return Publisher;
 }(_react2.default.Component);
 
+Publisher.defaultProps = {
+  folderMap: {},
+  linkMap: {}
+};
+
 Publisher.propTypes = {
-  folderMap: _propTypes2.default.objectOf(_propTypes2.default.array).isRequired,
-  linkMap: _propTypes2.default.objectOf(_propTypes2.default.array).isRequired
+  folderMap: _propTypes2.default.objectOf(_propTypes2.default.array),
+  linkMap: _propTypes2.default.objectOf(_propTypes2.default.array)
 };
 
 exports.default = Publisher;
