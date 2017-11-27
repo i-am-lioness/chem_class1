@@ -18529,8 +18529,8 @@ var FolderContents = function (_React$Component) {
 
     _this.state = {
       path: [],
-      currentFolderId: '',
-      currentVideo: { name: null, videoID: null }
+      currentFolderId: ''
+      // currentVideo: { name: null, videoID: null },
     };
 
     _this.navigate = _this.navigate.bind(_this);
@@ -18677,7 +18677,7 @@ var FolderContents = function (_React$Component) {
         anchor = _react2.default.createElement(
           'a',
           {
-            href: '#',
+            href: '#portfolioModalC',
             'data-toggle': 'modal',
             'data-target': '#portfolioModalC',
             onClick: function onClick(e) {
@@ -19780,17 +19780,13 @@ var Player = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, props));
 
-    _this.state = {
-      messages: [],
-      progress: 0
-    };
+    _this.state = {};
     return _this;
   }
 
   _createClass(Player, [{
     key: 'render',
     value: function render() {
-      debugger;
       return _react2.default.createElement(
         'div',
         {
@@ -19857,7 +19853,7 @@ var Player = function (_React$Component) {
 }(_react2.default.Component);
 
 Player.defaultProps = {
-  videoData: { name: null, videoID: null }
+  videoData: { name: '', videoID: '' }
 };
 
 Player.propTypes = {
