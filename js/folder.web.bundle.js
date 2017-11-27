@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 20);
+/******/ 	return __webpack_require__(__webpack_require__.s = 19);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -261,9 +261,9 @@ process.umask = function() { return 0; };
 /* WEBPACK VAR INJECTION */(function(process) {
 
 if (process.env.NODE_ENV === 'production') {
-  module.exports = __webpack_require__(21);
+  module.exports = __webpack_require__(20);
 } else {
-  module.exports = __webpack_require__(22);
+  module.exports = __webpack_require__(21);
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
@@ -586,11 +586,11 @@ if (process.env.NODE_ENV !== 'production') {
   // By explicitly using `prop-types` you are opting into new development behavior.
   // http://fb.me/prop-types-in-prod
   var throwOnDirectAccess = true;
-  module.exports = __webpack_require__(35)(isValidElement, throwOnDirectAccess);
+  module.exports = __webpack_require__(34)(isValidElement, throwOnDirectAccess);
 } else {
   // By explicitly using `prop-types` you are opting into new production behavior.
   // http://fb.me/prop-types-in-prod
-  module.exports = __webpack_require__(36)();
+  module.exports = __webpack_require__(35)();
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
@@ -805,7 +805,7 @@ module.exports = ReactPropTypesSecret;
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var invariant = __webpack_require__(33);
+var invariant = __webpack_require__(32);
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var splice = Array.prototype.splice;
@@ -1311,7 +1311,7 @@ module.exports = shallowEqual;
  * 
  */
 
-var isTextNode = __webpack_require__(25);
+var isTextNode = __webpack_require__(24);
 
 /*eslint-disable no-bitwise */
 
@@ -11632,237 +11632,6 @@ return jQuery;
 /* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// resolves . and .. elements in a path array with directory names there
-// must be no slashes, empty elements, or device names (c:\) in the array
-// (so also no leading and trailing slashes - it does not distinguish
-// relative and absolute paths)
-function normalizeArray(parts, allowAboveRoot) {
-  // if the path tries to go above the root, `up` ends up > 0
-  var up = 0;
-  for (var i = parts.length - 1; i >= 0; i--) {
-    var last = parts[i];
-    if (last === '.') {
-      parts.splice(i, 1);
-    } else if (last === '..') {
-      parts.splice(i, 1);
-      up++;
-    } else if (up) {
-      parts.splice(i, 1);
-      up--;
-    }
-  }
-
-  // if the path is allowed to go above the root, restore leading ..s
-  if (allowAboveRoot) {
-    for (; up--; up) {
-      parts.unshift('..');
-    }
-  }
-
-  return parts;
-}
-
-// Split a filename into [root, dir, basename, ext], unix version
-// 'root' is just a slash, or nothing.
-var splitPathRe =
-    /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
-var splitPath = function(filename) {
-  return splitPathRe.exec(filename).slice(1);
-};
-
-// path.resolve([from ...], to)
-// posix version
-exports.resolve = function() {
-  var resolvedPath = '',
-      resolvedAbsolute = false;
-
-  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-    var path = (i >= 0) ? arguments[i] : process.cwd();
-
-    // Skip empty and invalid entries
-    if (typeof path !== 'string') {
-      throw new TypeError('Arguments to path.resolve must be strings');
-    } else if (!path) {
-      continue;
-    }
-
-    resolvedPath = path + '/' + resolvedPath;
-    resolvedAbsolute = path.charAt(0) === '/';
-  }
-
-  // At this point the path should be resolved to a full absolute path, but
-  // handle relative paths to be safe (might happen when process.cwd() fails)
-
-  // Normalize the path
-  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
-    return !!p;
-  }), !resolvedAbsolute).join('/');
-
-  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
-};
-
-// path.normalize(path)
-// posix version
-exports.normalize = function(path) {
-  var isAbsolute = exports.isAbsolute(path),
-      trailingSlash = substr(path, -1) === '/';
-
-  // Normalize the path
-  path = normalizeArray(filter(path.split('/'), function(p) {
-    return !!p;
-  }), !isAbsolute).join('/');
-
-  if (!path && !isAbsolute) {
-    path = '.';
-  }
-  if (path && trailingSlash) {
-    path += '/';
-  }
-
-  return (isAbsolute ? '/' : '') + path;
-};
-
-// posix version
-exports.isAbsolute = function(path) {
-  return path.charAt(0) === '/';
-};
-
-// posix version
-exports.join = function() {
-  var paths = Array.prototype.slice.call(arguments, 0);
-  return exports.normalize(filter(paths, function(p, index) {
-    if (typeof p !== 'string') {
-      throw new TypeError('Arguments to path.join must be strings');
-    }
-    return p;
-  }).join('/'));
-};
-
-
-// path.relative(from, to)
-// posix version
-exports.relative = function(from, to) {
-  from = exports.resolve(from).substr(1);
-  to = exports.resolve(to).substr(1);
-
-  function trim(arr) {
-    var start = 0;
-    for (; start < arr.length; start++) {
-      if (arr[start] !== '') break;
-    }
-
-    var end = arr.length - 1;
-    for (; end >= 0; end--) {
-      if (arr[end] !== '') break;
-    }
-
-    if (start > end) return [];
-    return arr.slice(start, end - start + 1);
-  }
-
-  var fromParts = trim(from.split('/'));
-  var toParts = trim(to.split('/'));
-
-  var length = Math.min(fromParts.length, toParts.length);
-  var samePartsLength = length;
-  for (var i = 0; i < length; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      samePartsLength = i;
-      break;
-    }
-  }
-
-  var outputParts = [];
-  for (var i = samePartsLength; i < fromParts.length; i++) {
-    outputParts.push('..');
-  }
-
-  outputParts = outputParts.concat(toParts.slice(samePartsLength));
-
-  return outputParts.join('/');
-};
-
-exports.sep = '/';
-exports.delimiter = ':';
-
-exports.dirname = function(path) {
-  var result = splitPath(path),
-      root = result[0],
-      dir = result[1];
-
-  if (!root && !dir) {
-    // No dirname whatsoever
-    return '.';
-  }
-
-  if (dir) {
-    // It has a dirname, strip trailing slash
-    dir = dir.substr(0, dir.length - 1);
-  }
-
-  return root + dir;
-};
-
-
-exports.basename = function(path, ext) {
-  var f = splitPath(path)[2];
-  // TODO: make this comparison case-insensitive on windows?
-  if (ext && f.substr(-1 * ext.length) === ext) {
-    f = f.substr(0, f.length - ext.length);
-  }
-  return f;
-};
-
-
-exports.extname = function(path) {
-  return splitPath(path)[3];
-};
-
-function filter (xs, f) {
-    if (xs.filter) return xs.filter(f);
-    var res = [];
-    for (var i = 0; i < xs.length; i++) {
-        if (f(xs[i], i, xs)) res.push(xs[i]);
-    }
-    return res;
-}
-
-// String.prototype.substr - negative index don't work in IE8
-var substr = 'ab'.substr(-1) === 'b'
-    ? function (str, start, len) { return str.substr(start, len) }
-    : function (str, start, len) {
-        if (start < 0) start = str.length + start;
-        return str.substr(start, len);
-    }
-;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
@@ -11870,11 +11639,11 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(23);
+var _reactDom = __webpack_require__(22);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _folderEditor = __webpack_require__(32);
+var _folderEditor = __webpack_require__(31);
 
 var _folderEditor2 = _interopRequireDefault(_folderEditor);
 
@@ -11883,7 +11652,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 _reactDom2.default.render(_react2.default.createElement(_folderEditor2.default, null), document.getElementById('fileDisplay')); /* eslint-env browser */
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11912,7 +11681,7 @@ version:"16.1.1",__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED:{ReactCurren
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13263,7 +13032,7 @@ module.exports = react;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13301,15 +13070,15 @@ if (process.env.NODE_ENV === 'production') {
   // DCE check should happen before ReactDOM bundle executes so that
   // DevTools can report bad minification during injection.
   checkDCE();
-  module.exports = __webpack_require__(24);
+  module.exports = __webpack_require__(23);
 } else {
-  module.exports = __webpack_require__(27);
+  module.exports = __webpack_require__(26);
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13543,7 +13312,7 @@ Z.injectIntoDevTools({findFiberByHostInstance:qb,bundleType:0,version:"16.1.1",r
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13558,7 +13327,7 @@ Z.injectIntoDevTools({findFiberByHostInstance:qb,bundleType:0,version:"16.1.1",r
  * @typechecks
  */
 
-var isNode = __webpack_require__(26);
+var isNode = __webpack_require__(25);
 
 /**
  * @param {*} object The object to check.
@@ -13571,7 +13340,7 @@ function isTextNode(object) {
 module.exports = isTextNode;
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13599,7 +13368,7 @@ function isNode(object) {
 module.exports = isNode;
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13631,8 +13400,8 @@ var containsNode = __webpack_require__(16);
 var focusNode = __webpack_require__(17);
 var emptyObject = __webpack_require__(5);
 var checkPropTypes = __webpack_require__(9);
-var hyphenateStyleName = __webpack_require__(28);
-var camelizeStyleName = __webpack_require__(30);
+var hyphenateStyleName = __webpack_require__(27);
+var camelizeStyleName = __webpack_require__(29);
 
 /**
  * WARNING: DO NOT manually require this module.
@@ -29007,7 +28776,7 @@ module.exports = reactDom;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29022,7 +28791,7 @@ module.exports = reactDom;
 
 
 
-var hyphenate = __webpack_require__(29);
+var hyphenate = __webpack_require__(28);
 
 var msPattern = /^ms-/;
 
@@ -29049,7 +28818,7 @@ function hyphenateStyleName(string) {
 module.exports = hyphenateStyleName;
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29085,7 +28854,7 @@ function hyphenate(string) {
 module.exports = hyphenate;
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29100,7 +28869,7 @@ module.exports = hyphenate;
 
 
 
-var camelize = __webpack_require__(31);
+var camelize = __webpack_require__(30);
 
 var msPattern = /^-ms-/;
 
@@ -29128,7 +28897,7 @@ function camelizeStyleName(string) {
 module.exports = camelizeStyleName;
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29163,7 +28932,7 @@ function camelize(string) {
 module.exports = camelize;
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29183,15 +28952,15 @@ var _immutabilityHelper = __webpack_require__(11);
 
 var _immutabilityHelper2 = _interopRequireDefault(_immutabilityHelper);
 
-var _folderContent = __webpack_require__(34);
+var _folderContent = __webpack_require__(33);
 
 var _folderContent2 = _interopRequireDefault(_folderContent);
 
-var _publisher = __webpack_require__(38);
+var _publisher = __webpack_require__(37);
 
 var _publisher2 = _interopRequireDefault(_publisher);
 
-var _linkEditor = __webpack_require__(41);
+var _linkEditor = __webpack_require__(39);
 
 var _linkEditor2 = _interopRequireDefault(_linkEditor);
 
@@ -29207,8 +28976,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* eslint-env browser */
 /* global ADMIN */
-
-// import PropTypes from 'prop-types';
 
 
 var FolderEditor = function (_React$Component) {
@@ -29295,7 +29062,11 @@ var FolderEditor = function (_React$Component) {
           null,
           _react2.default.createElement(
             'a',
-            { className: 'btn btn-primary btn-lg btn-block', href: '#portfolioModalA', 'data-toggle': 'modal' },
+            {
+              className: 'btn btn-primary btn-lg btn-block',
+              href: '#portfolioModalA',
+              'data-toggle': 'modal'
+            },
             'Publish'
           ),
           _react2.default.createElement(_publisher2.default, {
@@ -29314,21 +29085,11 @@ var FolderEditor = function (_React$Component) {
 
   return FolderEditor;
 }(_react2.default.Component);
-/*
-FolderEditor.defaultProps = {
-  admin: false,
-};
-
-FolderEditor.propTypes = {
-  admin: PropTypes.bool,
-};
-*/
-
 
 exports.default = FolderEditor;
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29387,7 +29148,7 @@ module.exports = invariant;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29411,7 +29172,7 @@ var _immutabilityHelper = __webpack_require__(11);
 
 var _immutabilityHelper2 = _interopRequireDefault(_immutabilityHelper);
 
-var _player = __webpack_require__(37);
+var _player = __webpack_require__(36);
 
 var _player2 = _interopRequireDefault(_player);
 
@@ -29772,7 +29533,7 @@ FolderContents.propTypes = {
 exports.default = FolderContents;
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30322,7 +30083,7 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30387,7 +30148,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30510,7 +30271,7 @@ Player.propTypes = {
 exports.default = Player;
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30534,10 +30295,6 @@ var _immutabilityHelper = __webpack_require__(11);
 
 var _immutabilityHelper2 = _interopRequireDefault(_immutabilityHelper);
 
-var _gitPush = __webpack_require__(39);
-
-var _gitPush2 = _interopRequireDefault(_gitPush);
-
 var _klassroomUtil = __webpack_require__(8);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -30549,7 +30306,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* eslint-env browser */
 
 
-var _require = __webpack_require__(40),
+var _require = __webpack_require__(38),
     remote = _require.remote;
 
 var app = remote.app;
@@ -30557,6 +30314,7 @@ var app = remote.app;
 
 var fs = remote.require('fs-extra');
 var path = remote.require('path');
+var push = remote.require('git-push');
 
 var stages = {
   DEFAULT: 0,
@@ -30642,7 +30400,7 @@ var Publisher = function (_React$Component) {
         _this2.setState({ progress: 75 });
 
         return new Promise(function (resolve, reject) {
-          (0, _gitPush2.default)(tempWebsite, REMOTE_HOST, resolve);
+          push(tempWebsite, REMOTE_HOST, resolve);
         });
       }).then(function () {
         _this2.outputMessage('published at ' + REMOTE_HOST);
@@ -30763,234 +30521,13 @@ Publisher.propTypes = {
 exports.default = Publisher;
 
 /***/ }),
+/* 38 */
+/***/ (function(module, exports) {
+
+// empty (null-loader)
+
+/***/ }),
 /* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {/**
- * Copyright (c) Konstantin Tarkus (@koistya). All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
-
-
-var fs = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"fs\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
-var path = __webpack_require__(19);
-var exec = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"child_process\""); e.code = 'MODULE_NOT_FOUND'; throw e; }())).exec;
-var spawn = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"child_process\""); e.code = 'MODULE_NOT_FOUND'; throw e; }())).spawn;
-
-function push(sourceDir, remote, cb) {
-
-  if (!path.isAbsolute(sourceDir) && process) {
-    sourceDir = path.join(process.cwd(), sourceDir);
-  }
-
-  if (typeof remote === 'string') {
-    remote = {name: 'origin', url: remote, branch: 'master'};
-  }
-
-  remote.branch = remote.branch || 'master';
-  remote.name = remote.name || 'origin';
-
-  cb = cb || function() {};
-
-  var options = {cwd: sourceDir, stdio: 'inherit'};
-  var message = 'Update ' + new Date().toISOString();
-
-  // Start with an empty promise
-  Promise.resolve()
-
-    //
-    // Initialize a new Git repository if it doesn't exist
-    // -------------------------------------------------------------------------
-    .then(function() {
-      return new Promise(function(resolve, reject) {
-        if (!fs.existsSync(path.join(options.cwd, '.git'))) {
-          spawn('git', ['init'], options)
-            .on('exit', function(code) {
-              if (code === 0) {
-                resolve();
-              } else {
-                reject('Failed to initialize a new Git repository.');
-              }
-            });
-        } else {
-          resolve();
-        }
-      });
-    })
-
-    //
-    // Set a remote repository URL
-    // -------------------------------------------------------------------------
-    .then(function() {
-      return new Promise(function(resolve) {
-        exec('git config --get remote.' + remote.name + '.url', options,
-          function(err, stdout) {
-            if (stdout.trim() === '') {
-              spawn('git', ['remote', 'add', remote.name, remote.url], options)
-                .on('exit', function() {
-                  console.log('Add a new remote ' + remote.url + '(' + remote.name + ')');
-                  resolve();
-                });
-            } else if (stdout.trim() !== remote.url) {
-              spawn('git', ['remote', 'set-url', remote.name, remote.url], options)
-                .on('exit', function() {
-                  console.log('Set \'' + remote.name + '\' remote to ' + remote.url);
-                  resolve();
-                });
-            } else {
-              resolve();
-            }
-          }
-        );
-      });
-    })
-
-    //
-    // Check if target branch exists
-    // -------------------------------------------------------------------------
-    .then(function() {
-      return new Promise(function(resolve) {
-        exec('git ls-remote ' + remote.name + ' ' + remote.branch, options,
-          function(err, stdout) {
-            if (stdout.trim() === '') {
-              spawn('git', ['add', '.'], options)
-                .on('exit', function() {
-                  spawn('git', ['commit', '-m', message], options)
-                    .on('exit', function() {
-                      spawn('git', ['push', remote.name, 'master'], options)
-                        .on('exit', function() {
-                          cb();
-                        });
-                    });
-                });
-            } else {
-              resolve();
-            }
-          }
-        );
-      });
-    })
-
-    //
-    // Fetch the content of the remote repository
-    // -------------------------------------------------------------------------
-    .then(function() {
-      return new Promise(function(resolve, reject) {
-        console.log('Fetching remote repository...');
-        spawn('git', ['fetch', remote.name], options)
-          .on('exit', function(code) {
-            if (code === 0) {
-              resolve();
-            } else {
-              reject('Failed to fetch the remote repository ' + remote.url);
-            }
-          });
-      });
-    })
-
-    //
-    // Reset the local branch to the remote one
-    // -------------------------------------------------------------------------
-    .then(function() {
-      return new Promise(function(resolve, reject) {
-        var commit = remote.name + '/' + remote.branch;
-        spawn('git', ['reset', '--soft', commit], options)
-          .on('exit', function(code) {
-            if (code === 0) {
-              resolve();
-            } else {
-              reject('Failed to reset the local branch to ' + commit + '.');
-            }
-          });
-      });
-    })
-
-    //
-    // Add new/modified/deleted files to staging area
-    // -------------------------------------------------------------------------
-    .then(function() {
-      return new Promise(function(resolve, reject) {
-        console.log('Adding files to staging area...');
-        spawn('git', ['add', '--all', '.'], options)
-          .on('exit', function(code) {
-            if (code === 0) {
-              resolve();
-            } else {
-              reject();
-            }
-          });
-      });
-    })
-
-    //
-    // Create a new commit
-    // -------------------------------------------------------------------------
-    .then(function() {
-      return new Promise(function(resolve, reject) {
-        console.log('Creating a new commit...');
-        spawn('git', ['commit', '-m', message], options)
-          .on('exit', function(code) {
-            if (code === 0) {
-              resolve();
-            } else {
-              reject();
-            }
-          });
-      });
-    })
-
-    //
-    // Push to remote
-    // -------------------------------------------------------------------------
-    .then(function() {
-      return new Promise(function(resolve, reject) {
-        console.log('Pushing to ' + remote.url);
-        spawn('git', ['push', remote.name, 'master'], options)
-          .on('exit', function(code) {
-            if (code === 0) {
-              cb();
-            } else {
-              reject();
-            }
-          });
-      });
-    })
-
-    //
-    // Catch errors
-    // -------------------------------------------------------------------------
-    .catch(function(err) {
-      cb(err || 'Failed to push the contents.');
-    });
-}
-
-module.exports = push;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(__dirname) {var fs = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"fs\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()))
-var path = __webpack_require__(19)
-
-var pathFile = path.join(__dirname, 'path.txt')
-
-if (fs.existsSync(pathFile)) {
-  module.exports = path.join(__dirname, fs.readFileSync(pathFile, 'utf-8'))
-} else {
-  throw new Error('Electron failed to install correctly, please delete node_modules/electron and try installing again')
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, "/"))
-
-/***/ }),
-/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -31012,7 +30549,7 @@ var _propTypes2 = _interopRequireDefault(_propTypes);
 
 var _klassroomUtil = __webpack_require__(8);
 
-var _youtube = __webpack_require__(42);
+var _youtube = __webpack_require__(40);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -31255,7 +30792,7 @@ LinkEditor.propTypes = {
 exports.default = LinkEditor;
 
 /***/ }),
-/* 42 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function($) {/* eslint-env browser */
