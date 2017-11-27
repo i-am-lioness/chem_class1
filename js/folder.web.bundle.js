@@ -29330,7 +29330,7 @@ var FolderContents = function (_React$Component) {
         contentLink = _react2.default.createElement(
           'a',
           {
-            href: '#' + file.name,
+            href: '#resources',
             onClick: function onClick(e) {
               _this2.navigate(file, e, -1);
             }
@@ -29438,7 +29438,7 @@ var FolderContents = function (_React$Component) {
         _react2.default.createElement(
           'a',
           {
-            href: '#' + file.name,
+            href: '#resources',
             onClick: function onClick(e) {
               _this4.navigate(file, e, idx);
             }
@@ -30622,6 +30622,8 @@ var LinkEditor = function (_React$Component) {
         this.props.onAdd(linkData);
       }
       this.clearValues();
+
+      window.$('#portfolioModalB').modal('hide');
     }
   }, {
     key: 'searchYoutube',
