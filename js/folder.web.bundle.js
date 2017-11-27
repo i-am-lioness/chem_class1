@@ -30309,9 +30309,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var _require = __webpack_require__(38),
     remote = _require.remote;
 
-var app = remote.app;
-
-
 var fs = remote.require('fs-extra');
 var path = remote.require('path');
 var push = remote.require('git-push');
@@ -30367,6 +30364,8 @@ var Publisher = function (_React$Component) {
         stage: stages.PUBLISHING,
         messages: []
       });
+
+      var app = remote.app;
 
       var appPath = app.getAppPath();
       var tempPath = app.getPath('temp');
