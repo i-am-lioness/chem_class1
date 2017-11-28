@@ -31333,13 +31333,28 @@ var Player = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, props));
 
-    _this.state = {};
+    _this.state = {
+      play: false
+    };
     return _this;
   }
 
   _createClass(Player, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      window.$('#portfolioModalC').on('hidden.bs.modal', function (e) {
+        _this2.setState({ play: false });
+      });
+      window.$('#portfolioModalC').on('show.bs.modal', function (e) {
+        _this2.setState({ play: true });
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
+      var src = this.state.play ? 'https://www.youtube.com/embed/' + this.props.videoData.videoID + '?rel=0' : '';
       return _react2.default.createElement(
         'div',
         {
@@ -31388,7 +31403,7 @@ var Player = function (_React$Component) {
                       _react2.default.createElement('iframe', {
                         title: this.props.videoData.name,
                         className: 'embed-responsive-item',
-                        src: 'https://www.youtube.com/embed/' + this.props.videoData.videoID + '?rel=0',
+                        src: src,
                         allowFullScreen: true
                       })
                     )
