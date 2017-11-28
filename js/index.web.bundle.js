@@ -29420,24 +29420,6 @@ var FolderEditor = function (_React$Component) {
         _react2.default.createElement('i', { className: 'fa fa-spinner fa-pulse fa-3x fa-fw fa-5x' })
       );
 
-      var publishBtn = _react2.default.createElement(
-        'div',
-        { className: 'row' },
-        _react2.default.createElement(
-          'div',
-          { className: 'col-12' },
-          _react2.default.createElement(
-            'a',
-            {
-              className: 'btn btn-primary btn-lg btn-block',
-              href: '#portfolioModalA',
-              'data-toggle': 'modal'
-            },
-            'Publish'
-          )
-        )
-      );
-
       if (this.state.folderMap) {
         display = _react2.default.createElement(
           'span',
@@ -29454,7 +29436,16 @@ var FolderEditor = function (_React$Component) {
           false && _react2.default.createElement(
             'span',
             null,
-            publishBtn,
+            _react2.default.createElement(
+              'a',
+              {
+                className: 'btn btn-primary btn-lg btn-block',
+                href: '#portfolioModalA',
+                'data-toggle': 'modal',
+                style: { marginTop: 10 }
+              },
+              'Publish'
+            ),
             _react2.default.createElement(_publisher2.default, {
               folderMap: this.state.folderMap,
               linkMap: this.state.linkMap
